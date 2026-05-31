@@ -4,21 +4,7 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 
-<div class="top-bar">
-    <a class="logo" href="">
-        <img src="img/logo.svg" />
-    </a>
 
-    <NavLink href="" class="nav-tab" Match="NavLinkMatch.All">
-        <img src="img/pizza-slice.svg" />
-        <div>Get Pizza</div>
-    </NavLink>
-
-    <NavLink href="myorders" class="nav-tab">
-        <img src="img/bike.svg" />
-        <div>My Orders</div>
-    </NavLink>
-</div>
 
 <div class="main">
     <div class="checkout-cols">
@@ -30,7 +16,7 @@
                     <strong>
                         @(pizza.Size)"
                         @pizza.Special.Name
-                        (£@pizza.GetFormattedTotalPrice())
+                        ($@pizza.GetFormattedTotalPrice())
                     </strong>
                 </p>
             }
@@ -38,26 +24,29 @@
             <p>
                 <strong>
                     Total price:
-                    £@Order.GetFormattedTotalPrice()
+                    $@Order.GetFormattedTotalPrice()
                 </strong>
             </p>
         </div>
     </div>
 
     <button class="checkout-button btn btn-warning" @onclick="PlaceOrder" disabled=@isSubmitting>
-  Place order
-</button>
+        Place order
+    </button>
 </div>
 
 @code {
     Order Order => OrderState.Order;
-bool isSubmitting;
+    bool isSubmitting = false;
 
-async Task PlaceOrder()
-{
-    isSubmitting = true;
-    var response = await HttpClient.PostAsJsonAsync($"{NavigationManager.BaseUri}orders", OrderState.Order);
-    var newOrderId = await response.Content.ReadFromJsonAsync<int>();
-    OrderState.ResetOrder();
-    NavigationManager.NavigateTo($"myorders/{newOrderId}");
+    async Task PlaceOrder()
+    {
+        isSubmitting = true;
+        var response = await HttpClient.PostAsJsonAsync($"{NavigationManager.BaseUri}orders", OrderState.Order);
+        var newOrderId = await response.Content.ReadFromJsonAsync<int>();
+        OrderState.ResetOrder();
+        
+        // Step 8 navigation change applied here
+        NavigationManager.NavigateTo($"myorders/{newOrderId}");
+    }
 }
